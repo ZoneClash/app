@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wallet - ZoneClash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Teko:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --theme-color: #e2136e;
+            --theme-dark: #b60f58;
+            --bg: #f4f7fe;
+            --text: #1e293b;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Rajdhani', sans-serif; -webkit-tap-highlight-color:transparent; }
+        body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        .hidden { display: none !important; }
+
+        /* HEADER */
+        header { height: 60px; display: flex; align-items: center; padding: 0 15px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.03); z-index: 10; justify-content: space-between; }
+        .back-btn { font-size: 22px; color: #64748b; padding: 10px; cursor: pointer; }
+        .header-title { font-family: 'Teko'; font-size: 26px; font-weight: 700; text-transform: uppercase; color: #333; }
+        .help-btn { text-decoration: none; color: #64748b; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px; background: #f1f5f9; padding: 5px 10px; border-radius: 20px; transition: 0.2s; }
+        .help-btn:active { transform: scale(0.95); }
+
+        /* MAIN CONTENT */
+        #main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 50px; }
+
+        /* BALANCE CARD */
+        .balance-container {
+            background: linear-gradient(135deg, var(--theme-color), var(--theme-dark));
+            border-radius: 20px; padding: 25px 20px; color: #fff;
+            text-align: center; box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);
+            margin-bottom: 20px; transition: 0.3s;
+        }
+        .bal-label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; }
+        .bal-value { font-family: 'Teko'; font-size: 42px; font-weight: 700; line-height: 1.1; margin-top: 5px; }
+
+        /* TABS */
+        .tab-box { display: flex; background: #fff; padding: 5px; border-radius: 14px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; font-family: 'Teko'; font-size: 18px; color: #64748b; cursor: pointer; border-radius: 10px; transition: 0.2s; }
+        .tab-btn.active { background: var(--theme-color); color: #fff; }
+
+        /* GATEWAY SELECTOR */
+        .gw-wrapper { display: flex; gap: 15px; margin-bottom: 20px; }
+        .gw-item { 
+            flex: 1; background: #fff; height: 85px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: 2px solid transparent; transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); filter: grayscale(100%); opacity: 0.7;
+            position: relative; overflow: hidden;
+        }
+        .gw-item.active { border-color: var(--theme-color); filter: none; opacity: 1; transform: translateY(-2px); }
+        .gw-item img { height: 100%; width: 100%; object-fit: contain; padding: 15px; }
+        .gw-item.bkash img { padding: 5px; transform: scale(1.1); } 
+        .gw-item.nagad img { padding: 12px; }
+
+        /* INSTRUCTION CARD */
+        .pay-card {
+            background: var(--theme-color);
+            border-radius: 20px; padding: 20px; color: #fff;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            font-family: 'Hind Siliguri', sans-serif;
+            transition: 0.3s ease;
+        }
+        .pay-header { text-align: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; }
+        .number-box {
+            background: rgba(255,255,255,0.2); border-radius: 8px; padding: 8px 15px;
+            display: inline-flex; align-items: center; gap: 10px; margin-top: 5px;
+        }
+        .admin-num { font-family: 'Teko'; font-size: 26px; font-weight: 700; letter-spacing: 1px; line-height: 1; }
+        .copy-btn { background: #fff; color: var(--theme-color); border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+
+        /* Steps */
+        .step-list { list-style: none; padding: 0; margin-top: 15px; }
+        .step-item { display: flex; gap: 12px; margin-bottom: 12px; font-size: 14px; line-height: 1.4; color: rgba(255,255,255,0.95); }
+        .step-dot { min-width: 8px; height: 8px; background: #fff; border-radius: 50%; margin-top: 6px; box-shadow: 0 0 5px rgba(255,255,255,0.5); }
+        
+        /* Inputs */
+        .input-group { margin-bottom: 15px; }
+        .input-label { display: block; font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 6px; text-transform: uppercase; opacity: 0.9; }
+        .custom-input {
+            width: 100%; padding: 12px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.15); color: #fff; font-size: 18px; font-weight: 600;
+            outline: none; text-align: center; font-family: 'Teko'; letter-spacing: 1px;
+        }
+        .custom-input::placeholder { color: rgba(255,255,255,0.6); font-family: 'Rajdhani'; font-weight: 500; letter-spacing: 0; }
+        .custom-input:focus { background: rgba(255,255,255,0.25); border-color: #fff; }
+
+        /* Verify Button */
+        .verify-btn {
+            width: 100%; background: #fff; color: var(--theme-color);
+            border: none; padding: 14px; border-radius: 12px;
+            font-size: 20px; font-weight: 800; font-family: 'Teko'; letter-spacing: 1px;
+            margin-top: 20px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* HISTORY */
+        .his-card { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; border-left: 4px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .stat-badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-weight: 800; }
+        .trx-tag { font-size: 11px; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #334155; margin-top: 4px; display: inline-block; font-weight: 600; letter-spacing: 0.5px; }
+
+        /* LOADER */
+        #loader { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--theme-color); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* TOAST */
+        #toast-box { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 100000; width: 90%; max-width: 320px; pointer-events: none; }
+        .toast { 
+            background: #1e293b; color: #fff; padding: 14px 20px; border-radius: 50px; 
+            margin-bottom: 10px; font-size: 14px; text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); font-weight: 600;
+            opacity: 0; transform: translateY(-20px) scale(0.9); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .toast.show { opacity: 1; transform: translateY(0) scale(1); }
+        .toast i { color: #4ade80; font-size: 16px; }
+        .toast.error i { color: #f87171; }
+    </style>
+</head>
+<body>
+
+<div id="loader"><div class="spinner"></div></div>
+<div id="toast-box"></div>
+
+<header>
+    <div style="display:flex; align-items:center;">
+        <i class="fa-solid fa-arrow-left-long back-btn" onclick="location.href='index.html'"></i>
+        <div class="header-title" style="margin-left: 10px;">My Wallet</div>
+    </div>
+    <a href="help.html" class="help-btn">
+        <i class="fa-solid fa-shield-halved"></i> Help & Safety
+    </a>
+</header>
+
+<div id="main">
+    <!-- BALANCE -->
+    <div class="balance-container">
+        <div class="bal-label">Available Balance</div>
+        <div class="bal-value">৳ <span id="u-bal">0</span></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-box">
+        <button class="tab-btn active" id="btn-dep" onclick="switchTab('dep')">DEPOSIT</button>
+        <button class="tab-btn" id="btn-wit" onclick="switchTab('wit')">WITHDRAW</button>
+        <button class="tab-btn" id="btn-his" onclick="switchTab('his')">HISTORY</button>
+    </div>
+
+    <!-- DEPOSIT SECTION -->
+    <div id="sec-dep">
+        <div class="gw-wrapper">
+            <div class="gw-item bkash active" onclick="setGW('bkash')">
+                <img src="https://github.com/user-attachments/assets/757014f8-cea7-4d9f-a38f-642284da2220" alt="bKash">
+            </div>
+            <div class="gw-item nagad" onclick="setGW('nagad')">
+                <img src="https://github.com/user-attachments/assets/ff898608-9025-4289-a406-96711f3fdb86" alt="Nagad">
+            </div>
+        </div>
+
+        <div class="pay-card">
+            <div class="input-group">
+                <label class="input-label">Enter Amount (সর্বনিন্ম ৩০৳)</label>
+                <input type="number" id="dep-amt" class="custom-input" placeholder="৳ 30" oninput="updateInstructions()">
+            </div>
+
+            <div class="pay-header">
+                <div style="font-size: 16px; font-weight: 600;">Send Money to <span id="gw-name">bKash</span> Personal</div>
+                <div class="number-box">
+                    <span class="admin-num" id="admin-phn">01796325908</span>
+                    <button class="copy-btn" onclick="copyNum()">COPY</button>
+                </div>
+            </div>
+
+            <ul class="step-list">
+                <li class="step-item">
+                    <div class="step-dot"></div>
+                    <div><span id="ussd-code" style="font-weight:700;">*247#</span> ডায়াল করে মোবাইল মেনুতে যান অথবা অ্যাপ ব্যবহার করুন।</div>
+                </li>
+                <li class="step-item">
+                    <div class="step-dot"></div>
+                    <div><b>Send Money</b> অপশন সিলেক্ট করুন।</div>
+                </li>
+                <li class="step-item">
+                    <div class="step-dot"></div>
+                    <div>প্রাপক নম্বর হিসেবে উপরের নম্বরটি দিন।</div>
+                </li>
+                <li class="step-item">
+                    <div class="step-dot"></div>
+                    <div>টাকার পরিমাণ: <b style="background:rgba(0,0,0,0.2); padding:0 5px; border-radius:3px;">৳ <span id="inst-amt">0</span></b></div>
+                </li>
+                <li class="step-item">
+                    <div class="step-dot"></div>
+                    <div>Payment সফল হলে নিচে <b>Transaction ID</b> দিন।</div>
+                </li>
+                <li class="step-item">
+                    <div class="step-dot"></div>
+                    <div>নিচে TRX ID দেওয়ার পর <b>30 Minute</b> অপেক্ষা করুন।</div>
+                </li>
+            </ul>
+
+            <div class="input-group" style="margin-top: 20px;">
+                <label class="input-label">Transaction ID (TrxID)</label>
+                <input type="text" id="dep-trx" class="custom-input" placeholder="8N7S6D..." style="text-transform: uppercase;">
+            </div>
+
+            <button class="verify-btn" onclick="submitDep()">VERIFY PAYMENT</button>
+        </div>
+    </div>
+
+    <!-- WITHDRAW SECTION -->
+    <div id="sec-wit" class="hidden">
+        <div class="gw-wrapper">
+            <div class="gw-item bkash active" onclick="setGW('bkash')">
+                <img src="https://github.com/user-attachments/assets/757014f8-cea7-4d9f-a38f-642284da2220">
+            </div>
+            <div class="gw-item nagad" onclick="setGW('nagad')">
+                <img src="https://github.com/user-attachments/assets/ff898608-9025-4289-a406-96711f3fdb86">
+            </div>
+        </div>
+        
+        <div style="background:#fff; padding:20px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.05);">
+            <div class="input-group">
+                <label style="color:#64748b; font-size:12px; font-weight:700; margin-bottom:5px; display:block;">WITHDRAW AMOUNT</label>
+                <input type="number" id="wit-amt" style="width:100%; padding:14px; border:1px solid #cbd5e1; border-radius:8px; outline:none; font-weight:600;" placeholder="সর্বনিন্ম 100৳">
+            </div>
+            <div class="input-group">
+                <label style="color:#64748b; font-size:12px; font-weight:700; margin-bottom:5px; display:block;">RECEIVER NUMBER</label>
+                <input type="number" id="wit-num" style="width:100%; padding:14px; border:1px solid #cbd5e1; border-radius:8px; outline:none; font-weight:600;" placeholder="017XXXXXXXX">
+            </div>
+            <div style="font-size:12px; color:#e2136e; background:#fdf2f6; padding:12px; border-radius:8px; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-clock"></i> Withdraw-হতে সর্বোচ্চ ২৪ ঘন্টা সময় লাগে।
+            </div>
+            <button onclick="submitWit()" style="width:100%; padding:15px; background:var(--theme-color); color:#fff; border:none; border-radius:10px; font-weight:700; font-family:'Teko'; font-size:20px;">REQUEST WITHDRAW</button>
+        </div>
+    </div>
+
+    <!-- HISTORY SECTION -->
+    <div id="sec-his" class="hidden">
+        <div id="his-list"></div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, push, set, query, orderByChild, equalTo, limitToLast, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAFfNhpqy5BZBD_8IpGBjsZf9SvyPZj-54",
+        authDomain: "zc-team.firebaseapp.com",
+        databaseURL: "https://zc-team-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "zc-team",
+        messagingSenderId: "790397012628",
+        appId: "1:790397012628:web:547b1be9d1815d9378c281"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let currentUser = null;
+    let currentGW = 'bkash';
+
+    const ADMIN_NUMBERS = {
+        bkash: "01796325908",
+        nagad: "01796325908"
+    };
+
+    onAuthStateChanged(auth, u => {
+        if(u) {
+            onValue(ref(db, `users/${u.uid}`), s => {
+                if(s.exists()){
+                    currentUser = { ...s.val(), uid: u.uid };
+                    document.getElementById('u-bal').innerText = currentUser.balance || 0;
+                    document.getElementById('loader').style.display = 'none';
+                    loadHistory(u.uid);
+                }
+            });
+        } else { location.href = 'index.html'; }
+    });
+
+    // GLOBAL FUNCTIONS
+    window.switchTab = (t) => {
+        ['dep','wit','his'].forEach(x => {
+            document.getElementById(`sec-${x}`).classList.add('hidden');
+            document.getElementById(`btn-${x}`).classList.remove('active');
+        });
+        document.getElementById(`sec-${t}`).classList.remove('hidden');
+        document.getElementById(`btn-${t}`).classList.add('active');
+    };
+
+    window.setGW = (gw) => {
+        currentGW = gw;
+        const root = document.documentElement;
+        
+        document.querySelectorAll('.gw-item').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll(`.gw-item.${gw}`).forEach(e => e.classList.add('active'));
+
+        if(gw === 'bkash') {
+            root.style.setProperty('--theme-color', '#e2136e');
+            root.style.setProperty('--theme-dark', '#b60f58');
+            document.getElementById('gw-name').innerText = "bKash";
+            document.getElementById('ussd-code').innerText = "*247#";
+        } else {
+            root.style.setProperty('--theme-color', '#f15a29');
+            root.style.setProperty('--theme-dark', '#c03d12');
+            document.getElementById('gw-name').innerText = "Nagad";
+            document.getElementById('ussd-code').innerText = "*167#";
+        }
+        document.getElementById('admin-phn').innerText = ADMIN_NUMBERS[gw];
+    };
+
+    window.updateInstructions = () => {
+        const amt = document.getElementById('dep-amt').value;
+        document.getElementById('inst-amt').innerText = amt || "0";
+    };
+
+    window.copyNum = () => {
+        navigator.clipboard.writeText(document.getElementById('admin-phn').innerText);
+        showToast("Number Copied!", "success");
+    };
+
+    window.submitDep = async () => {
+        const amt = parseInt(document.getElementById('dep-amt').value);
+        const trx = document.getElementById('dep-trx').value.trim().toUpperCase();
+        
+        if(!amt || amt < 30) return showToast("Min Deposit ৳30", "error");
+        if(trx.length < 5) return showToast("Invalid TrxID", "error");
+
+        const btn = document.querySelector('#sec-dep .verify-btn');
+        btn.innerText = "Processing..."; btn.disabled = true;
+
+        try {
+            await push(ref(db, 'transactions'), {
+                uid: currentUser.uid,
+                name: currentUser.name || "User",
+                type: 'deposit',
+                method: currentGW,
+                amount: amt,
+                trxId: trx,
+                status: 'pending',
+                timestamp: Date.now()
+            });
+            showToast("Request Submitted!", "success");
+            document.getElementById('dep-trx').value = "";
+            document.getElementById('dep-amt').value = "";
+            updateInstructions();
+            window.switchTab('his');
+        } catch(e) { 
+            showToast("Request Unsuccessful", "error");
+        }
+        btn.innerText = "VERIFY PAYMENT"; btn.disabled = false;
+    };
+
+    window.submitWit = async () => {
+        const amt = parseInt(document.getElementById('wit-amt').value);
+        const num = document.getElementById('wit-num').value;
+        
+        if(!amt || amt < 100) return showToast("Min Withdraw ৳100", "error");
+        if(amt > currentUser.balance) return showToast("Insufficient Balance", "error");
+        if(num.length < 11) return showToast("Invalid Number", "error");
+        
+        const btn = document.querySelector('#sec-wit button');
+        btn.innerText = "Processing..."; btn.disabled = true;
+
+        try {
+            const updates = {};
+            updates[`users/${currentUser.uid}/balance`] = currentUser.balance - amt;
+            const key = push(ref(db, 'transactions')).key;
+            updates[`transactions/${key}`] = {
+                uid: currentUser.uid,
+                name: currentUser.name,
+                type: 'withdraw',
+                method: currentGW,
+                amount: amt,
+                number: num,
+                status: 'pending',
+                timestamp: Date.now()
+            };
+            await update(ref(db), updates);
+            showToast("Withdrawal Requested!", "success");
+            document.getElementById('wit-amt').value = "";
+            document.getElementById('wit-num').value = "";
+            window.switchTab('his');
+        } catch(e) { 
+            showToast("Request Unsuccessful", "error");
+        }
+        btn.innerText = "REQUEST WITHDRAW"; btn.disabled = false;
+    };
+
+    function loadHistory(uid) {
+        const list = document.getElementById('his-list');
+        // Fixed: Query to get last 20 transactions
+        const q = query(ref(db, 'transactions'), orderByChild('uid'), equalTo(uid), limitToLast(20));
+        
+        onValue(q, (snapshot) => {
+            list.innerHTML = "";
+            let items = [];
+            
+            // Push items into array to handle them properly
+            snapshot.forEach(child => {
+                items.push(child.val());
+            });
+
+            // Reverse to show newest first
+            items.reverse();
+
+            if(items.length === 0) {
+                list.innerHTML = "<p style='text-align:center; color:#94a3b8; margin-top:30px; font-size:14px;'>No transactions found.</p>";
+                return;
+            }
+
+            items.forEach(d => {
+                const color = d.type === 'deposit' ? '#22c55e' : '#ef4444';
+                // Display TrxID if available
+                const trxDisplay = d.type === 'deposit' && d.trxId ? `<div class="trx-tag">Trx: ${d.trxId}</div>` : '';
+                
+                list.innerHTML += `
+                <div class="his-card" style="border-left-color:${color}">
+                    <div>
+                        <div style="font-weight:700; text-transform:uppercase; font-size:14px; margin-bottom:2px;">
+                            ${d.type} <span style="font-size:11px; color:#64748b; font-weight:500;">(${d.method})</span>
+                        </div>
+                        <div style="font-size:11px; color:#94a3b8;">${new Date(d.timestamp).toLocaleString()}</div>
+                        ${trxDisplay}
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-family:'Teko'; font-size:20px; font-weight:700;">৳${d.amount}</div>
+                        <span class="stat-badge" style="background:${d.status=='pending'?'#fff7ed':(d.status=='success'?'#f0fdf4':'#fef2f2')}; color:${d.status=='pending'?'#ea580c':(d.status=='success'?'#16a34a':'#dc2626')}">${d.status}</span>
+                    </div>
+                </div>`;
+            });
+        });
+    }
+
+    function showToast(msg, type = 'success') {
+        const box = document.getElementById('toast-box');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+        
+        const icon = type === 'error' ? '<i class="fa-solid fa-circle-exclamation"></i>' : '<i class="fa-solid fa-circle-check"></i>';
+        toast.innerHTML = `${icon} <span>${msg}</span>`;
+        
+        box.appendChild(toast);
+        
+        // Trigger animation
+        requestAnimationFrame(() => {
+            toast.classList.add('show');
+        });
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }, 3000);
+    }
+</script>
+</body>
+</html>

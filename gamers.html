@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gamers Zone - ZoneClash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --bg: #f1f5f9; 
+            --text: #0f172a;
+            --primary: #2563eb;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Rajdhani', sans-serif; -webkit-tap-highlight-color:transparent; }
+        body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* HEADER */
+        header { height: 60px; display: flex; align-items: center; padding: 0 15px; background: #fff; z-index: 50; box-shadow: 0 2px 10px rgba(0,0,0,0.05); gap: 15px; }
+        .back-btn { font-size: 22px; color: #334155; cursor: pointer; padding: 5px; }
+        .page-title { font-family: 'Teko'; font-size: 28px; color: #2563eb; letter-spacing: 1px; font-weight: 600; text-transform: uppercase; }
+
+        /* SEARCH & ACTIONS AREA */
+        .top-controls { padding: 12px 15px; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; gap: 10px; align-items: center; }
+        
+        /* Search Box */
+        .search-box { position: relative; flex: 1; }
+        .search-inp { width: 100%; padding: 10px 10px 10px 38px; border: 2px solid #e2e8f0; border-radius: 8px; background: #f8fafc; font-size: 16px; outline: none; transition: 0.3s; font-family: 'Rajdhani'; font-weight: 700; height: 48px; color: #1e293b; }
+        .search-inp:focus { border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 18px; }
+
+        /* Mini Action Buttons */
+        .action-btns { display: flex; gap: 8px; }
+        .mini-btn { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: 0.2s; position: relative; }
+        .mini-btn:active { transform: scale(0.92); }
+        
+        .btn-lead { background: linear-gradient(135deg, #FFD700, #FDB931); } /* Leaderboard */
+        .btn-comm { background: linear-gradient(135deg, #3a7bd5, #3a6073); } /* Communities */
+
+        /* LIST AREA */
+        #gamers-list { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 50px; scroll-behavior: smooth; }
+        
+        /* --- COLORFUL & ANIMATED GAMER ITEM --- */
+        .gamer-item { 
+            background: linear-gradient(145deg, #1e293b, #0f172a); /* Dark Premium Look */
+            color: #fff;
+            border-radius: 12px; padding: 12px 15px; margin-bottom: 12px; 
+            display: flex; align-items: center; gap: 15px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15); 
+            border: 1px solid #334155;
+            cursor: pointer; position: relative; overflow: hidden;
+            
+            /* Strong Lazy Load States */
+            opacity: 0; 
+            transform: translateY(40px) scale(0.95);
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .gamer-item.visible { opacity: 1; transform: translateY(0) scale(1); }
+        .gamer-item:active { transform: scale(0.98); filter: brightness(1.2); }
+
+        /* Decorative Glow */
+        .gamer-item::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: #2563eb;
+        }
+
+        .g-avatar { width: 55px; height: 55px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; border: 2px solid #475569; box-shadow: 0 2px 5px rgba(0,0,0,0.3); color: #fff; }
+        .g-info { flex: 1; }
+        .g-name-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px; }
+        .g-name { font-family: 'Teko'; font-size: 22px; line-height: 1; color: #f8fafc; letter-spacing: 0.5px; }
+        .g-uid { font-size: 13px; color: #94a3b8; font-weight: 600; font-family: monospace; letter-spacing: 0.5px; }
+        
+        .g-view-icon { width: 30px; height: 30px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; }
+
+        /* --- BADGES (Exact Match with Index) --- */
+        .ff-badge { 
+            font-size: 9px; padding: 3px 8px; color: #fff; font-weight: 800; text-transform: uppercase; display: inline-block;
+            clip-path: polygon(50% 0, 100% 15%, 85% 100%, 50% 85%, 15% 100%, 0 15%);
+            min-width: 50px; text-align: center; text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.4);
+            margin-left: 5px;
+        }
+        .b-owner { background: linear-gradient(180deg, #ff0000, #b30000); }
+        .b-admin { background: linear-gradient(180deg, #FFD700, #FF8C00); color: #000; text-shadow: none; }
+        .b-vip { background: linear-gradient(180deg, #FF00CC, #333399); }
+        .b-pro { background: linear-gradient(180deg, #00C6FF, #0072FF); }
+        .b-creator { background: linear-gradient(180deg, #00FF00, #006400); color: #000; text-shadow: none; }
+
+        /* STATES */
+        .loading-st { text-align: center; color: #64748b; font-size: 14px; margin-top: 20px; font-weight: 700; display: none; }
+        .no-res { text-align: center; margin-top: 40px; color: #94a3b8; display: none; }
+
+        /* MODAL STYLES (FF CARD) */
+        #prof-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .prof-card-box { width: 95%; max-width: 380px; background: transparent; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .ff-card { background: #1a1a1a; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
+        .ff-head { background: linear-gradient(90deg, #2a2a2a, #1a1a1a); padding: 10px 15px; border-bottom: 2px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .ff-title { font-family: 'Teko'; color: #fff; font-size: 22px; letter-spacing: 1px; }
+        .close-modal { color: #ef4444; font-size: 22px; cursor: pointer; }
+
+        .ff-body { display: flex; height: 130px; background: #f0f0f0; position: relative; }
+        .ff-side { width: 110px; background: #FFC107; clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%); display: flex; justify-content: center; align-items: center; position: relative; z-index: 2; }
+        .ff-p-img { width: 75px; height: 75px; background: #333; border: 3px solid #1a1a1a; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 35px; overflow: hidden; }
+        
+        .ff-info { flex: 1; padding: 10px 10px 10px 0; display: flex; flex-direction: column; }
+        .ff-p-name { font-family: 'Rajdhani'; font-weight: 800; font-size: 22px; color: #000; margin-bottom: 2px; line-height: 1.1; display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+        .ff-p-ign { font-size: 14px; font-weight: 700; color: #444; margin-bottom: 5px; }
+        .ff-p-uid { background: #1a1a1a; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; display: inline-block; border: 1px solid #444; margin-top: auto; align-self: flex-start; }
+
+        .ff-socials { display: flex; gap: 8px; margin-top: 5px; }
+        .soc-btn { width: 26px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; font-size: 13px; }
+        .yt { background: #FF0000; } .fb { background: #1877F2; } .tt { background: #000000; }
+
+        .ff-bio { background: #222; padding: 12px; color: #ccc; font-size: 13px; font-style: italic; border-top: 4px solid #FFC107; line-height: 1.4; min-height: 60px; }
+        .ff-stats { display: grid; grid-template-columns: 1fr 1fr; background: #111; padding: 10px; border-top: 1px solid #333; }
+        .stat-box { text-align: center; border-right: 1px solid #333; }
+        .stat-box:last-child { border: none; }
+        .stat-val { color: #fff; font-family: 'Teko'; font-size: 22px; line-height: 1; }
+        .stat-lbl { color: #888; font-size: 10px; text-transform: uppercase; }
+
+        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 12px; font-weight: 600; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 3000; }
+        #toast.show { opacity: 1; bottom: 100px; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <i class="fa-solid fa-arrow-left back-btn" onclick="goHome()"></i>
+        <div class="page-title">Gamers Zone</div>
+    </header>
+
+    <div class="top-controls">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" class="search-inp" id="search-input" placeholder="Search Players by name..." autocomplete="off">
+        </div>
+        
+        <div class="action-btns">
+            <!-- LEADERBOARD -->
+            <div class="mini-btn btn-lead" onclick="openPage('leaderboard.html')">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <!-- COMMUNITIES (UPDATED ICON) -->
+            <div class="mini-btn btn-comm" onclick="openPage('communities.html')">
+                <i class="fa-solid fa-users-line"></i>
+            </div>
+        </div>
+    </div>
+
+    <div id="gamers-list">
+        <!-- Default State -->
+        <div style="text-align:center; margin-top:50px; color:#94a3b8;">
+            <i class="fa-solid fa-gamepad" style="font-size:60px; margin-bottom:15px; opacity:0.3;"></i>
+            <p>Find your rivals & friends.<br>Tap to view stats.</p>
+        </div>
+    </div>
+    
+    <div class="loading-st" id="loader">SEARCHING...</div>
+    <div class="no-res" id="no-result">
+        <i class="fa-regular fa-face-sad-tear" style="font-size:35px; margin-bottom:10px;"></i>
+        <p>No player found.</p>
+    </div>
+
+    <!-- PROFILE MODAL -->
+    <div id="prof-modal" onclick="closeModal(event)">
+        <div class="prof-card-box">
+            <div class="ff-card">
+                <div class="ff-head">
+                    <span class="ff-title">PLAYER CARD</span>
+                    <i class="fa-solid fa-xmark close-modal" onclick="closeModalBtn()"></i>
+                </div>
+                
+                <div class="ff-body">
+                    <div class="ff-side">
+                        <div class="ff-p-img">👤</div>
+                    </div>
+                    <div class="ff-info">
+                        <div class="ff-p-name" id="m-name-box">
+                            <span id="m-name">---</span>
+                            <span id="m-badge"></span>
+                        </div>
+                        <div class="ff-p-ign">IGN: <span id="m-ign" style="color:#2563eb">---</span></div>
+                        <div class="ff-socials" id="m-socials"></div>
+                        <div class="ff-p-uid" onclick="copyUidModal()">
+                            UID: <span id="m-uid">---</span> <i class="fa-regular fa-copy" style="margin-left:5px; cursor:pointer;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ff-stats">
+                    <div class="stat-box">
+                        <div class="stat-val" id="m-matches">0</div>
+                        <div class="stat-lbl">Matches</div>
+                    </div>
+                    <!-- CHANGED TO BALANCE -->
+                    <div class="stat-box">
+                        <div class="stat-val" style="color:#FFC107">৳ <span id="m-bal">0</span></div>
+                        <div class="stat-lbl">Balance</div>
+                    </div>
+                </div>
+
+                <div class="ff-bio" id="m-bio">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">UID Copied!</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, query, orderByChild, startAt, endAt, get, limitToFirst } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyAFfNhpqy5BZBD_8IpGBjsZf9SvyPZj-54",
+          authDomain: "zc-team.firebaseapp.com",
+          databaseURL: "https://zc-team-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "zc-team",
+          storageBucket: "zc-team.firebasestorage.app",
+          messagingSenderId: "790397012628",
+          appId: "1:790397012628:web:547b1be9d1815d9378c281",
+          measurementId: "G-KDN8KGT1PJ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const searchInp = document.getElementById('search-input');
+        const listContainer = document.getElementById('gamers-list');
+        const loader = document.getElementById('loader');
+        const noRes = document.getElementById('no-result');
+        let searchTimeout = null;
+
+        window.goHome = () => window.location.href = 'index.html';
+        window.openPage = (p) => window.location.href = p;
+
+        // --- STRONG LAZY LOAD OBSERVER ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        searchInp.addEventListener('input', (e) => {
+            const val = e.target.value.trim().toLowerCase();
+            clearTimeout(searchTimeout);
+            
+            if(val.length === 0) {
+                listContainer.innerHTML = `
+                    <div style="text-align:center; margin-top:50px; color:#94a3b8;">
+                        <i class="fa-solid fa-gamepad" style="font-size:60px; margin-bottom:15px; opacity:0.3;"></i>
+                        <p>Find your rivals & friends.<br>Tap to view stats.</p>
+                    </div>`;
+                loader.style.display = 'none';
+                noRes.style.display = 'none';
+                return;
+            }
+
+            loader.style.display = 'block';
+            noRes.style.display = 'none';
+            listContainer.innerHTML = '';
+
+            searchTimeout = setTimeout(() => performSearch(val), 800);
+        });
+
+        async function performSearch(term) {
+            const q = query(ref(db, 'users'), orderByChild('name_lowercase'), startAt(term), endAt(term + "\uf8ff"), limitToFirst(20));
+            try {
+                const snapshot = await get(q);
+                loader.style.display = 'none';
+                listContainer.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        const u = child.val();
+                        renderUserItem(u);
+                    });
+                } else {
+                    noRes.style.display = 'block';
+                }
+            } catch (error) {
+                console.error(error);
+                loader.style.display = 'none';
+            }
+        }
+
+        function renderUserItem(user) {
+            const div = document.createElement('div');
+            div.className = 'gamer-item'; // Hidden initially via CSS
+            
+            div.innerHTML = `
+                <div class="g-avatar">👤</div>
+                <div class="g-info">
+                    <div class="g-name-row">
+                        <span class="g-name">${user.name}</span>
+                        ${getBadgeHtml(user.badge)}
+                    </div>
+                    <div class="g-uid">UID: ${user.ffID || '---'}</div>
+                </div>
+                <div class="g-view-icon"><i class="fa-solid fa-chevron-right"></i></div>
+            `;
+            div.onclick = () => openProfile(user);
+            listContainer.appendChild(div);
+            
+            // Trigger animation
+            observer.observe(div);
+        }
+
+        function getBadgeHtml(b) {
+            if(!b) return '';
+            const badges = {
+                'OWNER': '<span class="ff-badge b-owner">OWNER</span>',
+                'ADMIN': '<span class="ff-badge b-admin">ADMIN</span>',
+                'VIP': '<span class="ff-badge b-vip">VIP</span>',
+                'PRO': '<span class="ff-badge b-pro">PRO</span>',
+                'CREATOR': '<span class="ff-badge b-creator">CREATOR</span>'
+            };
+            return badges[b] || ``;
+        }
+
+        function formatMoney(n) { return Number(n).toLocaleString('en-US'); }
+
+        window.openProfile = (user) => {
+            document.getElementById('m-name').innerText = user.name;
+            document.getElementById('m-badge').innerHTML = getBadgeHtml(user.badge);
+            document.getElementById('m-ign').innerText = user.ign || "Not Set";
+            document.getElementById('m-uid').innerText = user.ffID || "---";
+            document.getElementById('m-bio').innerText = user.bio || "User has no bio.";
+            
+            const mCount = user.registeredTournaments ? Object.keys(user.registeredTournaments).length : 0;
+            document.getElementById('m-matches').innerText = mCount;
+            document.getElementById('m-bal').innerText = formatMoney(user.balance || 0);
+
+            const sDiv = document.getElementById('m-socials');
+            sDiv.innerHTML = '';
+            if(user.ytLink) sDiv.innerHTML += `<a href="${user.ytLink}" target="_blank" class="soc-btn yt"><i class="fa-brands fa-youtube"></i></a>`;
+            if(user.fbLink) sDiv.innerHTML += `<a href="${user.fbLink}" target="_blank" class="soc-btn fb"><i class="fa-brands fa-facebook"></i></a>`;
+            if(user.ttLink) sDiv.innerHTML += `<a href="${user.ttLink}" target="_blank" class="soc-btn tt"><i class="fa-brands fa-tiktok"></i></a>`;
+            if(sDiv.innerHTML === '') sDiv.innerHTML = '<span style="font-size:10px; color:#888;">No social links</span>';
+
+            document.getElementById('prof-modal').style.display = 'flex';
+        }
+
+        window.closeModal = (e) => { if (e.target.id === 'prof-modal') document.getElementById('prof-modal').style.display = 'none'; }
+        window.closeModalBtn = () => document.getElementById('prof-modal').style.display = 'none';
+
+        window.copyUidModal = () => {
+            const uid = document.getElementById('m-uid').innerText;
+            navigator.clipboard.writeText(uid);
+            const t = document.getElementById('toast');
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+</html>

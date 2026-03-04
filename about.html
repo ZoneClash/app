@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>About ZoneClash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --accent: #00d4ff;
+            --grad-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Rajdhani', sans-serif; -webkit-tap-highlight-color:transparent; }
+        body { background-color: var(--light); color: var(--dark); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* HEADER */
+        header { 
+            height: 65px; display: flex; align-items: center; padding: 0 20px; 
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        .back-btn { font-size: 22px; color: var(--dark); cursor: pointer; padding: 5px; transition: 0.2s; }
+        .back-btn:active { transform: scale(0.9); }
+        .header-title { flex: 1; text-align: center; font-family: 'Teko'; font-size: 26px; font-weight: 700; color: var(--dark); letter-spacing: 1px; margin-right: 25px; }
+
+        /* SCROLL AREA */
+        #main { flex: 1; overflow-y: auto; padding-top: 65px; scrollbar-width: none; }
+        #main::-webkit-scrollbar { display: none; }
+
+        /* HERO SECTION */
+        .hero-section {
+            background: var(--grad-bg);
+            padding: 40px 20px 70px; text-align: center; color: #fff;
+            border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
+            position: relative; margin-bottom: 60px; overflow: hidden;
+        }
+        
+        /* Animated Background Elements */
+        .hero-bg-circle {
+            position: absolute; width: 200px; height: 200px; background: var(--primary);
+            filter: blur(80px); opacity: 0.4; border-radius: 50%;
+            top: -50px; left: -50px; animation: float 6s infinite ease-in-out;
+        }
+        .hero-bg-circle:nth-child(2) { top: auto; bottom: -50px; left: auto; right: -50px; background: var(--accent); animation-delay: 3s; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(20px); } }
+
+        .logo-container {
+            width: 110px; height: 110px; margin: 0 auto 15px; position: relative; z-index: 2;
+            border-radius: 25px; padding: 5px; background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        .logo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; }
+        
+        .hero-title { font-family: 'Teko'; font-size: 42px; line-height: 1; margin-bottom: 5px; position: relative; z-index: 2; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .hero-sub { font-size: 14px; opacity: 0.9; margin-bottom: 15px; position: relative; z-index: 2; letter-spacing: 0.5px; }
+        .ver-badge { 
+            background: linear-gradient(90deg, #2563eb, #00d4ff); padding: 4px 15px; border-radius: 20px; 
+            font-size: 11px; font-weight: 700; display: inline-block; position: relative; z-index: 2;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        /* FLOATING STATS */
+        .stats-float {
+            background: #fff; width: 85%; margin: 0 auto;
+            border-radius: 16px; display: flex; padding: 20px 10px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1); position: absolute;
+            left: 50%; transform: translateX(-50%); bottom: -40px; z-index: 10;
+        }
+        .stat-item { flex: 1; text-align: center; position: relative; }
+        .stat-item::after { content: ''; position: absolute; right: 0; top: 10%; height: 80%; width: 1px; background: #e2e8f0; }
+        .stat-item:last-child::after { display: none; }
+        .stat-val { font-family: 'Teko'; font-size: 28px; font-weight: 700; color: var(--primary); line-height: 1; }
+        .stat-lbl { font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* SECTIONS */
+        .container { padding: 0 20px; margin-bottom: 30px; }
+        .sec-title { 
+            font-family: 'Teko'; font-size: 28px; color: var(--dark); 
+            margin-bottom: 15px; display: flex; align-items: center; gap: 10px;
+            border-left: 5px solid var(--primary); padding-left: 10px;
+        }
+        
+        /* WHO WE ARE CARD */
+        .story-card {
+            background: #fff; border-radius: 16px; padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03); border: 1px solid #f1f5f9;
+            text-align: justify; color: #475569; font-size: 15px; line-height: 1.6;
+        }
+        .story-highlight { color: var(--primary); font-weight: 700; }
+
+        /* SPECIAL FEATURES GRID */
+        .feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .feat-item {
+            background: #fff; padding: 15px; border-radius: 14px; text-align: center;
+            border: 1px solid #f1f5f9; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            transition: 0.2s; position: relative; overflow: hidden;
+        }
+        .feat-item:active { transform: scale(0.96); }
+        .feat-item::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--primary);
+        }
+        .feat-icon { 
+            width: 40px; height: 40px; background: #eff6ff; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;
+            color: var(--primary); font-size: 18px;
+        }
+        .feat-head { font-family: 'Teko'; font-size: 18px; line-height: 1.2; margin-bottom: 4px; }
+        .feat-desc { font-size: 11px; color: #94a3b8; line-height: 1.3; }
+
+        /* MANIFESTO / SPECIAL CARD */
+        .manifesto-box {
+            background: #1e293b; color: #fff; border-radius: 16px; padding: 30px 20px;
+            position: relative; overflow: hidden; text-align: center;
+            box-shadow: 0 10px 30px rgba(30, 41, 59, 0.4);
+        }
+        .manifesto-box::before {
+            content: '\f10d'; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; top: 10px; left: 20px; font-size: 60px; color: rgba(255,255,255,0.05);
+        }
+        .m-text { font-style: italic; opacity: 0.9; font-size: 14px; margin-bottom: 15px; position: relative; z-index: 2; }
+        .m-sig { font-family: 'Teko'; font-size: 20px; color: var(--accent); letter-spacing: 1px; }
+
+        /* HOW IT WORKS (Vertical) */
+        .timeline { position: relative; padding-left: 20px; }
+        .timeline::before {
+            content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 2px;
+            background: #cbd5e1; border-radius: 2px;
+        }
+        .t-item { position: relative; padding-left: 25px; margin-bottom: 25px; }
+        .t-dot {
+            position: absolute; left: -6px; top: 0; width: 14px; height: 14px;
+            background: var(--primary); border: 3px solid #fff; border-radius: 50%;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+        }
+        .t-head { font-family: 'Teko'; font-size: 20px; margin-bottom: 2px; color: #1e293b; }
+        .t-body { font-size: 13px; color: #64748b; }
+
+        /* SOCIAL CONNECT */
+        .social-box {
+            background: #fff; border-radius: 16px; padding: 20px; text-align: center;
+            border: 1px solid #f1f5f9;
+        }
+        .social-icons { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+        .s-btn {
+            width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 22px; color: #fff; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .s-btn:active { transform: translateY(3px); box-shadow: none; }
+        
+        .tg { background: #229ED9; }
+        .yt { background: #FF0000; }
+        .wa { background: #25D366; }
+        .fb { background: #1877F2; }
+
+        /* FOOTER */
+        footer {
+            background: var(--dark); color: #94a3b8; padding: 40px 20px 20px;
+            margin-top: 30px; border-top-left-radius: 30px; border-top-right-radius: 30px;
+            text-align: center;
+        }
+        .foot-links a { color: #cbd5e1; text-decoration: none; margin: 0 8px; font-size: 12px; }
+        .copy { margin-top: 20px; font-size: 11px; opacity: 0.6; }
+        .made-with { margin-top: 5px; font-size: 11px; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <i class="fa-solid fa-arrow-left-long back-btn" onclick="location.href='index.html'"></i>
+        <div class="header-title">About Us</div>
+    </header>
+
+    <div id="main">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="hero-bg-circle"></div>
+            <div class="hero-bg-circle"></div>
+
+            <div class="logo-container">
+                <img src="https://github.com/user-attachments/assets/173d7de6-7073-4ccb-94fa-a61e01429abf" class="logo-img" alt="Logo">
+            </div>
+            
+            <div class="hero-title">ZONECLASH</div>
+            <div class="hero-sub">Bangladesh's Most Trusted Esports Arena</div>
+            <div class="ver-badge">Ver 3.0.0 (Official)</div>
+
+            <!-- Animated Stats -->
+            <div class="stats-float">
+                <div class="stat-item">
+                    <div class="stat-val" data-target="15000">0</div>
+                    <div class="stat-lbl">Active Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val" data-target="5000">0</div>
+                    <div class="stat-lbl">Daily Matches</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-val">100</div>
+                    <div class="stat-lbl">% Trusted</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Who We Are -->
+        <div class="container" style="margin-top: 30px;">
+            <div class="sec-title"><i class="fa-solid fa-users-viewfinder"></i> Who We Are</div>
+            <div class="story-card">
+                <p>
+                    <span class="story-highlight">ZoneClash</span> is not just an app; it's a revolution for the Bangladeshi Gaming Community. We started with a simple dream: to provide a platform where skill meets reward.
+                </p>
+                <br>
+                <p>
+                    We understand the frustration of fake tournaments and delayed payments. That's why we built ZoneClash - a <span class="story-highlight">100% Secure</span> environment where your gameplay determines your earnings. From automated match IDs to instant withdrawals, we are setting a new standard in Esports.
+                </p>
+            </div>
+        </div>
+
+        <!-- Special Features -->
+        <div class="container">
+            <div class="sec-title"><i class="fa-solid fa-star"></i> Why We Are Special</div>
+            <div class="feat-grid">
+                <div class="feat-item">
+                    <div class="feat-icon"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                    <div class="feat-head">Instant Pay</div>
+                    <div class="feat-desc">Withdraw winnings to bKash/Nagad within minutes.</div>
+                </div>
+                <div class="feat-item">
+                    <div class="feat-icon"><i class="fa-solid fa-shield-cat"></i></div>
+                    <div class="feat-head">Anti-Cheat</div>
+                    <div class="feat-desc">Advanced monitoring to ensure fair gameplay.</div>
+                </div>
+                <div class="feat-item">
+                    <div class="feat-icon"><i class="fa-solid fa-headset"></i></div>
+                    <div class="feat-head">24/7 Support</div>
+                    <div class="feat-desc">Real humans ready to help you anytime.</div>
+                </div>
+                <div class="feat-item">
+                    <div class="feat-icon"><i class="fa-solid fa-users"></i></div>
+                    <div class="feat-head">Community</div>
+                    <div class="feat-desc">Join thousands of active gamers daily.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dev Manifesto -->
+        <div class="container">
+            <div class="manifesto-box">
+                <div class="m-text">
+                    "Our goal is to turn your gaming passion into a profession. We promise transparency, security, and endless fun. This is your zone to clash!"
+                </div>
+                <div class="m-sig">- ZoneClash Admin Team</div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="container">
+            <div class="sec-title"><i class="fa-solid fa-stairs"></i> How It Works</div>
+            <div class="story-card" style="padding-left: 20px;">
+                <div class="timeline">
+                    <div class="t-item">
+                        <div class="t-dot"></div>
+                        <div class="t-head">Register & Login</div>
+                        <div class="t-body">Create your account instantly using email.</div>
+                    </div>
+                    <div class="t-item">
+                        <div class="t-dot"></div>
+                        <div class="t-head">Add Coins</div>
+                        <div class="t-body">Securely deposit using bKash or Nagad.</div>
+                    </div>
+                    <div class="t-item">
+                        <div class="t-dot"></div>
+                        <div class="t-head">Join Match</div>
+                        <div class="t-body">Select your favorite map and enter the battle.</div>
+                    </div>
+                    <div class="t-item">
+                        <div class="t-dot"></div>
+                        <div class="t-head">Win & Withdraw</div>
+                        <div class="t-body">Kill enemies, win Booyah, and get paid!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connect -->
+        <div class="container">
+            <div class="social-box">
+                <div style="font-family:'Teko'; font-size:22px; color:#1e293b;">Join The Family</div>
+                <p style="font-size:12px; color:#64748b;">Stay updated with news & giveaways</p>
+                <div class="social-icons">
+                    <div class="s-btn tg" onclick="window.open('https://t.me/your_link')"><i class="fa-brands fa-telegram"></i></div>
+                    <div class="s-btn yt" onclick="window.open('https://youtube.com')"><i class="fa-brands fa-youtube"></i></div>
+                    <div class="s-btn wa" onclick="window.open('https://wa.me/your_number')"><i class="fa-brands fa-whatsapp"></i></div>
+                    <div class="s-btn fb" onclick="window.open('https://facebook.com')"><i class="fa-brands fa-facebook-f"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div style="font-family:'Teko'; font-size:32px; color:#fff; letter-spacing:1px; margin-bottom:10px;">ZONECLASH</div>
+            <div class="foot-links">
+                <a href="#">Privacy Policy</a> • 
+                <a href="#">Terms</a> • 
+                <a href="#">Refunds</a>
+            </div>
+            <div class="copy">&copy; 2026 ZoneClash Team. All rights reserved.</div>
+            <div class="made-with">Developed by <i class="fa-solid fa-heart" style="color:#ef4444;"></i> Glova Zone.</div>
+        </footer>
+
+    </div>
+
+    <script>
+        // Number Counter Animation
+        const counters = document.querySelectorAll('.stat-val');
+        const speed = 200;
+
+        const animateStats = () => {
+            counters.forEach(counter => {
+                const updateCount = () => {
+                    const target = +counter.getAttribute('data-target');
+                    const count = +counter.innerText.replace('+', '').replace('%', '');
+                    const inc = target / speed;
+
+                    if (count < target) {
+                        let suffix = target === 100 ? '%' : '+';
+                        counter.innerText = Math.ceil(count + inc) + suffix;
+                        setTimeout(updateCount, 20);
+                    } else {
+                        let suffix = target === 100 ? '%' : '+';
+                        counter.innerText = target + suffix;
+                    }
+                };
+                updateCount();
+            });
+        }
+
+        // Trigger animation on load
+        window.addEventListener('load', animateStats);
+    </script>
+</body>
+</html>

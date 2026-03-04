@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Coming Soon - ZoneClash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Rajdhani', sans-serif; -webkit-tap-highlight-color:transparent; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .container {
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            max-width: 400px;
+            width: 100%;
+            position: relative;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Animated Icon */
+        .icon-box {
+            width: 100px; height: 100px;
+            background: #eff6ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--primary);
+            font-size: 45px;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .title {
+            font-family: 'Teko';
+            font-size: 38px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #64748b;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .badge {
+            background: #fef3c7;
+            color: #d97706;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 20px;
+            border: 1px solid #fde68a;
+        }
+
+        /* Home Button */
+        .btn-home {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-family: 'Teko';
+            font-size: 22px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+            width: 100%;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-home:active {
+            transform: scale(0.98);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 70%;
+            background: var(--primary);
+            border-radius: 10px;
+            animation: load 2s ease-out forwards;
+        }
+        @keyframes load { from { width: 0; } to { width: 70%; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="icon-box">
+            <i class="fa-solid fa-person-digging"></i>
+        </div>
+
+        <div class="badge">DEVELOPMENT MODE</div>
+        
+        <div class="title">Coming Soon</div>
+        
+        <p class="subtitle">
+            This page is currently under construction. We are working hard to bring this feature to you!
+        </p>
+
+        <!-- Fake Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+
+        <button class="btn-home" onclick="window.location.href='index.html'">
+            <i class="fa-solid fa-house"></i> GO BACK HOME
+        </button>
+    </div>
+
+</body>
+</html>

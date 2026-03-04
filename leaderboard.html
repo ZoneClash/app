@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Leaderboard - ZoneClash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --bg: #f1f5f9; 
+            --text: #0f172a;
+            --primary: #2563eb;
+            --gold: linear-gradient(135deg, #FFD700, #FDB931);
+            --silver: linear-gradient(135deg, #E0E0E0, #BDBDBD);
+            --bronze: linear-gradient(135deg, #CD7F32, #A0522D);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Rajdhani', sans-serif; -webkit-tap-highlight-color:transparent; }
+        body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* HEADER */
+        header { height: 60px; display: flex; align-items: center; padding: 0 15px; background: #fff; z-index: 50; box-shadow: 0 2px 10px rgba(0,0,0,0.05); gap: 15px; }
+        .back-btn { font-size: 22px; color: #334155; cursor: pointer; padding: 5px; }
+        .page-title { font-family: 'Teko'; font-size: 28px; color: #2563eb; letter-spacing: 1px; font-weight: 600; text-transform: uppercase; }
+
+        /* --- UPDATED BUTTON STYLE TABS --- */
+        .tabs-container { 
+            background: #fff; padding: 15px; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+            border-bottom: 1px solid #e2e8f0; 
+        }
+        .tab-btn { 
+            text-align: center; padding: 12px; 
+            font-family: 'Teko'; font-size: 20px; letter-spacing: 0.5px;
+            border-radius: 10px; cursor: pointer; transition: 0.2s; 
+            background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .tab-btn i { font-size: 16px; margin-top: -2px; }
+        
+        .tab-btn.active { 
+            background: linear-gradient(135deg, #2563eb, #1d4ed8); 
+            color: #fff; border-color: #2563eb;
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+            transform: translateY(-2px);
+        }
+        .tab-btn:active { transform: scale(0.96); }
+
+        /* LIST AREA */
+        #lb-list { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 50px; scroll-behavior: smooth; }
+        
+        /* CARD STYLES (Dark Premium) */
+        .rank-card { 
+            background: linear-gradient(145deg, #1e293b, #0f172a); 
+            color: #fff;
+            border-radius: 12px; padding: 12px; margin-bottom: 10px; 
+            display: flex; align-items: center; gap: 12px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 1px solid #334155;
+            cursor: pointer; position: relative; overflow: hidden;
+
+            /* Strong Lazy Load Animation */
+            opacity: 0; 
+            transform: translateY(30px) scale(0.95);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        
+        .rank-card.visible { opacity: 1; transform: translateY(0) scale(1); }
+        .rank-card:active { transform: scale(0.98); filter: brightness(1.2); }
+
+        /* TOP 3 HIGHLIGHTS */
+        .rank-card.top-1 { border: 1px solid #FDB931; box-shadow: 0 0 15px rgba(253, 185, 49, 0.2); background: linear-gradient(145deg, #2a2a2a, #1a1a1a); }
+        .rank-card.top-2 { border: 1px solid #E0E0E0; background: linear-gradient(145deg, #2a2a2a, #1a1a1a); }
+        .rank-card.top-3 { border: 1px solid #CD7F32; background: linear-gradient(145deg, #2a2a2a, #1a1a1a); }
+
+        .rank-num { width: 35px; font-family: 'Teko'; font-size: 24px; font-weight: 700; color: #64748b; text-align: center; }
+        
+        /* MEDALS */
+        .medal-icon { font-size: 28px; display: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
+        .top-1 .rank-num span { display: none; } .top-1 .medal-icon { display: block; background: var(--gold); -webkit-background-clip: text; color: transparent; }
+        .top-2 .rank-num span { display: none; } .top-2 .medal-icon { display: block; background: var(--silver); -webkit-background-clip: text; color: transparent; }
+        .top-3 .rank-num span { display: none; } .top-3 .medal-icon { display: block; background: var(--bronze); -webkit-background-clip: text; color: transparent; }
+
+        .r-avatar { width: 45px; height: 45px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; border: 2px solid #475569; position: relative; }
+        .top-1 .r-avatar { border-color: #FDB931; }
+
+        .r-info { flex: 1; }
+        .r-name { font-family: 'Teko'; font-size: 20px; line-height: 1; color: #fff; display: flex; align-items: center; gap: 6px; }
+        .r-detail { font-size: 13px; color: #94a3b8; font-weight: 600; margin-top: 2px; }
+        
+        .r-val-box { text-align: right; }
+        .r-val { font-family: 'Teko'; font-size: 22px; font-weight: 600; color: #60a5fa; line-height: 1; }
+        .r-lbl { font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 700; }
+
+        /* BADGES */
+        .ff-badge { 
+            font-size: 9px; padding: 3px 8px; color: #fff; font-weight: 800; text-transform: uppercase; display: inline-block;
+            clip-path: polygon(50% 0, 100% 15%, 85% 100%, 50% 85%, 15% 100%, 0 15%);
+            min-width: 50px; text-align: center; text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.4);
+        }
+        .b-owner { background: linear-gradient(180deg, #ff0000, #b30000); }
+        .b-admin { background: linear-gradient(180deg, #FFD700, #FF8C00); color: #000; text-shadow: none; }
+        .b-vip { background: linear-gradient(180deg, #FF00CC, #333399); }
+        .b-pro { background: linear-gradient(180deg, #00C6FF, #0072FF); }
+        .b-creator { background: linear-gradient(180deg, #00FF00, #006400); color: #000; text-shadow: none; }
+
+        /* LOADING & ERROR */
+        .loader-box { display: flex; justify-content: center; align-items: center; height: 200px; flex-direction: column; color: #94a3b8; }
+        .spinner { width: 30px; height: 30px; border: 3px solid #e2e8f0; border-top: 3px solid #2563eb; border-radius: 50%; animation: spin 1s infinite linear; margin-bottom: 15px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .error-msg { text-align: center; margin-top: 50px; color: #ef4444; font-weight: 600; }
+
+        /* MODAL */
+        #prof-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .prof-card-box { width: 95%; max-width: 380px; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .ff-card { background: #1a1a1a; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #333; }
+        .ff-head { background: linear-gradient(90deg, #2a2a2a, #1a1a1a); padding: 10px 15px; border-bottom: 2px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .ff-title { font-family: 'Teko'; color: #fff; font-size: 22px; letter-spacing: 1px; }
+        .close-modal { color: #ef4444; font-size: 22px; cursor: pointer; }
+
+        .ff-body { display: flex; height: 130px; background: #f0f0f0; position: relative; }
+        .ff-side { width: 110px; background: #FFC107; clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%); display: flex; justify-content: center; align-items: center; position: relative; z-index: 2; }
+        .ff-p-img { width: 75px; height: 75px; background: #333; border: 3px solid #1a1a1a; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 35px; overflow: hidden; }
+        
+        .ff-info { flex: 1; padding: 10px 10px 10px 0; display: flex; flex-direction: column; }
+        .ff-p-name { font-family: 'Rajdhani'; font-weight: 800; font-size: 22px; color: #000; margin-bottom: 2px; line-height: 1.1; display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+        .ff-p-ign { font-size: 14px; font-weight: 700; color: #444; margin-bottom: 5px; }
+        .ff-p-uid { background: #1a1a1a; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; display: inline-block; border: 1px solid #444; margin-top: auto; align-self: flex-start; }
+        .ff-socials { display: flex; gap: 8px; margin-top: 5px; }
+        .soc-btn { width: 26px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #fff; text-decoration: none; font-size: 13px; }
+        .yt { background: #FF0000; } .fb { background: #1877F2; } .tt { background: #000000; }
+        .ff-stats { display: grid; grid-template-columns: 1fr 1fr; background: #111; padding: 10px; border-top: 1px solid #333; }
+        .stat-box { text-align: center; border-right: 1px solid #333; }
+        .stat-box:last-child { border: none; }
+        .stat-val { color: #fff; font-family: 'Teko'; font-size: 22px; line-height: 1; }
+        .stat-lbl { color: #888; font-size: 10px; text-transform: uppercase; }
+        .ff-bio { background: #222; padding: 12px; color: #ccc; font-size: 13px; font-style: italic; border-top: 4px solid #FFC107; line-height: 1.4; min-height: 60px; }
+
+        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 12px; font-weight: 600; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 3000; }
+        #toast.show { opacity: 1; bottom: 100px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <i class="fa-solid fa-arrow-left back-btn" onclick="window.location.href='index.html'"></i>
+        <div class="page-title">Leaderboard</div>
+    </header>
+
+    <div class="tabs-container">
+        <!-- FIXED BUTTON LOOK -->
+        <div class="tab-btn active" onclick="switchTab('rich', this)">
+            <i class="fa-solid fa-coins"></i> RICH LIST
+        </div>
+        <div class="tab-btn" onclick="switchTab('fighter', this)">
+            <i class="fa-solid fa-fire"></i> TOP FIGHTERS
+        </div>
+    </div>
+
+    <div id="lb-list">
+        <!-- Content inject via JS -->
+    </div>
+
+    <!-- PROFILE MODAL -->
+    <div id="prof-modal" onclick="closeModal(event)">
+        <div class="prof-card-box">
+            <div class="ff-card">
+                <div class="ff-head">
+                    <span class="ff-title">PLAYER STATS</span>
+                    <i class="fa-solid fa-xmark close-modal" onclick="closeModalBtn()"></i>
+                </div>
+                
+                <div class="ff-body">
+                    <div class="ff-side">
+                        <div class="ff-p-img">👤</div>
+                    </div>
+                    <div class="ff-info">
+                        <div class="ff-p-name" id="m-name-box">
+                            <span id="m-name">---</span>
+                            <span id="m-badge"></span>
+                        </div>
+                        <div class="ff-p-ign">IGN: <span id="m-ign" style="color:#2563eb">---</span></div>
+                        <div class="ff-socials" id="m-socials"></div>
+                        <div class="ff-p-uid" onclick="copyUidModal()">
+                            UID: <span id="m-uid">---</span> <i class="fa-regular fa-copy" style="margin-left:5px; cursor:pointer;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ff-stats">
+                    <div class="stat-box">
+                        <div class="stat-val" id="m-matches">0</div>
+                        <div class="stat-lbl">Matches</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-val" style="color:#FFC107">৳ <span id="m-bal">0</span></div>
+                        <div class="stat-lbl">Balance</div>
+                    </div>
+                </div>
+                <div class="ff-bio" id="m-bio">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">UID Copied!</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, query, orderByChild, limitToLast, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyAFfNhpqy5BZBD_8IpGBjsZf9SvyPZj-54",
+          authDomain: "zc-team.firebaseapp.com",
+          databaseURL: "https://zc-team-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "zc-team",
+          storageBucket: "zc-team.firebasestorage.app",
+          messagingSenderId: "790397012628",
+          appId: "1:790397012628:web:547b1be9d1815d9378c281",
+          measurementId: "G-KDN8KGT1PJ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const listContainer = document.getElementById('lb-list');
+        
+        // --- STRONG LAZY LOAD OBSERVER ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        // Initial Load
+        loadRichList();
+
+        window.switchTab = (tab, el) => {
+            document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+            if(el) el.classList.add('active');
+            
+            listContainer.innerHTML = `<div class="loader-box"><div class="spinner"></div><span>Loading Rankings...</span></div>`;
+            
+            if(tab === 'rich') loadRichList();
+            else if(tab === 'fighter') loadFighters();
+        }
+
+        // 1. TOP 100 BALANCE
+        async function loadRichList() {
+            // Fetch largest 100 balances
+            const q = query(ref(db, 'users'), orderByChild('balance'), limitToLast(100));
+            try {
+                const snap = await get(q);
+                let data = [];
+                snap.forEach(c => {
+                    let u = c.val();
+                    u.balance = Number(u.balance || 0);
+                    data.push(u);
+                });
+                
+                // Sort Highest to Lowest
+                data.sort((a, b) => b.balance - a.balance);
+                renderList(data, 'balance');
+            } catch(e) { 
+                console.error(e);
+                listContainer.innerHTML = '<div class="error-msg">Error loading Balance list.</div>'; 
+            }
+        }
+
+        // 2. TOP 100 MATCHES
+        async function loadFighters() {
+            const q = query(ref(db, 'users'), orderByChild('matchCount'), limitToLast(100));
+            try {
+                const snap = await get(q);
+                let data = [];
+                snap.forEach(c => {
+                    let u = c.val();
+                    u.matchCount = Number(u.matchCount || 0);
+                    data.push(u);
+                });
+
+                // Sort Highest to Lowest
+                data.sort((a, b) => b.matchCount - a.matchCount);
+                renderList(data, 'matches');
+            } catch(e) { 
+                console.error(e);
+                listContainer.innerHTML = '<div class="error-msg">Error loading Fighters list.</div>'; 
+            }
+        }
+
+        function renderList(users, type) {
+            listContainer.innerHTML = '';
+            if(users.length === 0) {
+                listContainer.innerHTML = '<div style="text-align:center;margin-top:50px;color:#94a3b8;"><i class="fa-solid fa-ghost" style="font-size:40px;margin-bottom:10px;"></i><p>No players found.</p></div>';
+                return;
+            }
+
+            users.forEach((u, index) => {
+                const rank = index + 1;
+                let rankClass = '';
+                if(rank === 1) rankClass = 'top-1';
+                else if(rank === 2) rankClass = 'top-2';
+                else if(rank === 3) rankClass = 'top-3';
+
+                let medalIcon = '';
+                if(rank <= 3) medalIcon = '<i class="fa-solid fa-medal medal-icon"></i>';
+
+                let valDisplay = '';
+                let valLabel = '';
+                if(type === 'balance') {
+                    valDisplay = `৳${Number(u.balance || 0).toLocaleString()}`;
+                    valLabel = 'TOTAL BALANCE';
+                } else if(type === 'matches') {
+                    valDisplay = u.matchCount || 0;
+                    valLabel = 'MATCHES PLAYED';
+                }
+
+                const div = document.createElement('div');
+                div.className = `rank-card ${rankClass}`;
+                div.innerHTML = `
+                    <div class="rank-num">
+                        <span>#${rank}</span>
+                        ${medalIcon}
+                    </div>
+                    <div class="r-avatar">👤</div>
+                    <div class="r-info">
+                        <div class="r-name">${u.name} ${getBadgeHtml(u.badge)}</div>
+                        <div class="r-detail">UID: ${u.ffID || '---'}</div>
+                    </div>
+                    <div class="r-val-box">
+                        <div class="r-val">${valDisplay}</div>
+                        <div class="r-lbl">${valLabel}</div>
+                    </div>
+                `;
+                div.onclick = () => openProfile(u);
+                listContainer.appendChild(div);
+                observer.observe(div);
+            });
+        }
+
+        function getBadgeHtml(b) {
+            if(!b) return '';
+            const badges = {
+                'OWNER': '<span class="ff-badge b-owner">OWNER</span>',
+                'ADMIN': '<span class="ff-badge b-admin">ADMIN</span>',
+                'VIP': '<span class="ff-badge b-vip">VIP</span>',
+                'PRO': '<span class="ff-badge b-pro">PRO</span>',
+                'CREATOR': '<span class="ff-badge b-creator">CREATOR</span>'
+            };
+            return badges[b] || ``;
+        }
+        function formatMoney(n) { return Number(n).toLocaleString('en-US'); }
+
+        window.openProfile = (user) => {
+            document.getElementById('m-name').innerText = user.name;
+            document.getElementById('m-badge').innerHTML = getBadgeHtml(user.badge);
+            document.getElementById('m-ign').innerText = user.ign || "Not Set";
+            document.getElementById('m-uid').innerText = user.ffID || "---";
+            document.getElementById('m-bio').innerText = user.bio || "No Bio.";
+            const mCount = user.registeredTournaments ? Object.keys(user.registeredTournaments).length : 0;
+            document.getElementById('m-matches').innerText = mCount;
+            document.getElementById('m-bal').innerText = formatMoney(user.balance || 0);
+            const sDiv = document.getElementById('m-socials');
+            sDiv.innerHTML = '';
+            if(user.ytLink) sDiv.innerHTML += `<a href="${user.ytLink}" target="_blank" class="soc-btn yt"><i class="fa-brands fa-youtube"></i></a>`;
+            if(user.fbLink) sDiv.innerHTML += `<a href="${user.fbLink}" target="_blank" class="soc-btn fb"><i class="fa-brands fa-facebook"></i></a>`;
+            if(user.ttLink) sDiv.innerHTML += `<a href="${user.ttLink}" target="_blank" class="soc-btn tt"><i class="fa-brands fa-tiktok"></i></a>`;
+            if(sDiv.innerHTML === '') sDiv.innerHTML = '<span style="font-size:10px; color:#888;">No social links</span>';
+            document.getElementById('prof-modal').style.display = 'flex';
+        }
+        window.closeModal = (e) => { if (e.target.id === 'prof-modal') document.getElementById('prof-modal').style.display = 'none'; }
+        window.closeModalBtn = () => document.getElementById('prof-modal').style.display = 'none';
+        window.copyUidModal = () => {
+            navigator.clipboard.writeText(document.getElementById('m-uid').innerText);
+            const t = document.getElementById('toast');
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2000);
+        }
+    </script>
+</body>
+</html>
