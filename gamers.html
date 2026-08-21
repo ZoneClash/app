@@ -144,7 +144,7 @@
             <div class="mini-btn btn-lead" onclick="openPage('leaderboard.html')">
                 <i class="fa-solid fa-trophy"></i>
             </div>
-            <!-- COMMUNITIES (UPDATED ICON) -->
+            <!-- COMMUNITIES -->
             <div class="mini-btn btn-comm" onclick="openPage('guilds.html')">
                 <i class="fa-solid fa-users-line"></i>
             </div>
@@ -196,7 +196,6 @@
                         <div class="stat-val" id="m-matches">0</div>
                         <div class="stat-lbl">Matches</div>
                     </div>
-                    <!-- CHANGED TO BALANCE -->
                     <div class="stat-box">
                         <div class="stat-val" style="color:#FFC107">৳ <span id="m-bal">0</span></div>
                         <div class="stat-lbl">Balance</div>
@@ -212,6 +211,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        // Auth মডিউল এবং onAuthStateChanged ইমপোর্ট করা হলো
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
         import { getDatabase, ref, query, orderByChild, startAt, endAt, get, limitToFirst } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -226,6 +227,7 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app); // Auth ইনিশিয়ালাইজেশন
         const db = getDatabase(app);
 
         const searchInp = document.getElementById('search-input');
@@ -236,6 +238,13 @@
 
         window.goHome = () => window.location.href = 'index.html';
         window.openPage = (p) => window.location.href = p;
+
+        // ইউজার সেশন রিকভারি নিশ্চিত করার প্রসেস
+        onAuthStateChanged(auth, u => {
+            if(!u) {
+                window.location.href = 'index.html'; // লগআউট অবস্থায় থাকলে হোমে রিডাইরেক্ট করবে
+            }
+        });
 
         // --- STRONG LAZY LOAD OBSERVER ---
         const observer = new IntersectionObserver((entries) => {
@@ -292,7 +301,7 @@
 
         function renderUserItem(user) {
             const div = document.createElement('div');
-            div.className = 'gamer-item'; // Hidden initially via CSS
+            div.className = 'gamer-item'; 
             
             div.innerHTML = `
                 <div class="g-avatar">👤</div>
@@ -308,7 +317,6 @@
             div.onclick = () => openProfile(user);
             listContainer.appendChild(div);
             
-            // Trigger animation
             observer.observe(div);
         }
 
